@@ -1,172 +1,126 @@
-import datetime
-import random
-
-import altair as alt
-import numpy as np
-import pandas as pd
 import streamlit as st
+import requests
 
-# Show app title and description.
-st.set_page_config(page_title="Support tickets", page_icon="🎫")
-st.title("🎫 Support tickets")
-st.write(
-    """
-    This app shows how you can build an internal tool in Streamlit. Here, we are 
-    implementing a support ticket workflow. The user can create a ticket, edit 
-    existing tickets, and view some statistics.
-    """
-)
+NOME_IA = "Pixel"
+MODELO = "qwen3:1.7b"
 
-# Create a random Pandas dataframe with existing tickets.
-if "df" not in st.session_state:
+st.set_page_config(page_title=NOME_IA, page_icon="🤖", layout="wide")
 
-    # Set seed for reproducibility.
-    np.random.seed(42)
+st.markdown("""
+<style>
+.block-container{padding-top:1.2rem;padding-bottom:1rem;max-width:1400px;}
+[data-testid="stSidebar"]{background:#f4f8ff;border-right:1px solid #dce7f7;}
+.hero{display:flex;gap:28px;align-items:center;padding:18px 10px 10px 10px;}
+.hero img{width:290px;max-width:35vw;border-radius:24px;box-shadow:0 8px 28px rgba(15,45,90,.10)}
+.hero h1{font-size:3.2rem;margin:0;color:#0d2b57}.hero h1 span{color:#1976e9}
+.hero h3{margin:.2rem 0 1rem;color:#5d6f8c;font-weight:500}.hero p{font-size:1.15rem;color:#243b5a;line-height:1.6}
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+.quick{background:#fff;border:1px solid #dfe8f5;border-radius:18px;padding:18px;text-align:center;box-shadow:0 4px 12px rgba(15,45,90,.06)}
+.quick b{display:block;margin-top:6px;color:#16355e}.quick .ico{font-size:2rem}
+.chatbox{background:#fff;border:1px solid #dfe8f5;border-radius:22px;padding:18px;box-shadow:0 10px 30px rgba(15,45,90,.07);margin-top:24px}
+.small-note{text-align:center;color:#8b97aa;font-size:.85rem;margin-top:10px}
+.footer-note{text-align:center;color:#6f7f96;font-size:.9rem;margin-top:12px}
+</style>
+""", unsafe_allow_html=True)
 
-    # Make up some fake issue descriptions.
-    issue_descriptions = [
-        "Network connectivity issues in the office",
-        "Software application crashing on startup",
-        "Printer not responding to print commands",
-        "Email server downtime",
-        "Data backup failure",
-        "Login authentication problems",
-        "Website performance degradation",
-        "Security vulnerability identified",
-        "Hardware malfunction in the server room",
-        "Employee unable to access shared files",
-        "Database connection failure",
-        "Mobile application not syncing data",
-        "VoIP phone system issues",
-        "VPN connection problems for remote employees",
-        "System updates causing compatibility issues",
-        "File server running out of storage space",
-        "Intrusion detection system alerts",
-        "Inventory management system errors",
-        "Customer data not loading in CRM",
-        "Collaboration tool not sending notifications",
-    ]
+with st.sidebar:
+    st.markdown("## 💬 Pixel")
+    st.caption("SEMPRE AO SEU LADO")
+    st.divider()
+    menu = st.radio("", ["💬 Chat", "📚 Base de Conhecimento", "▶️ Tutoriais", "🎫 Abrir Chamado", "📢 Novidades", "ℹ️ Sobre a Pixel"])
+    st.divider()
+    st.markdown("**Precisa de um humano?**")
+    st.button("👤 Falar com o time de TI", use_container_width=True)
+    st.write("")
+    st.markdown("### Pixel")
+    st.caption("Mais que tecnologia. Soluções para o seu dia a dia.")
 
-    # Generate the dataframe with 100 rows/tickets.
-    data = {
-        "ID": [f"TICKET-{i}" for i in range(1100, 1000, -1)],
-        "Issue": np.random.choice(issue_descriptions, size=100),
-        "Status": np.random.choice(["Open", "In Progress", "Closed"], size=100),
-        "Priority": np.random.choice(["High", "Medium", "Low"], size=100),
-        "Date Submitted": [
-            datetime.date(2023, 6, 1) + datetime.timedelta(days=random.randint(0, 182))
-            for _ in range(100)
-        ],
-    }
-    df = pd.DataFrame(data)
+if menu == "💬 Chat":
+    col1, col2 = st.columns([1, 2.2])
+    with col1:
+        try:
+            st.image("pixel_seu_assistente_de_ti.png", use_container_width=True)
+        except Exception:
+            st.markdown("### 🤖 Pixel")
+    with col2:
+        st.markdown("# Olá! Eu sou o <span style='color:#1976e9'>Pixel</span>", unsafe_allow_html=True)
+        st.markdown("### Seu assistente virtual de suporte de TI")
+        st.write("Estou aqui para ajudar com suas dúvidas, solucionar problemas e tornar o seu dia a dia mais fácil. **Pode perguntar!**")
+        st.markdown("""
+        <div class='quick-grid'>
+          <div class='quick'><div class='ico'>🪟</div><b>Problemas no Windows</b></div>
+          <div class='quick'><div class='ico'>🖨️</div><b>Impressoras</b></div>
+          <div class='quick'><div class='ico'>✉️</div><b>Outlook</b></div>
+          <div class='quick'><div class='ico'>👥</div><b>Teams</b></div>
+          <div class='quick'><div class='ico'>🌐</div><b>Internet / VPN</b></div>
+          <div class='quick'><div class='ico'>🔐</div><b>Acessos e Senhas</b></div>
+          <div class='quick'><div class='ico'>⚙️</div><b>Sistemas</b></div>
+          <div class='quick'><div class='ico'>💡</div><b>Dicas e Tutoriais</b></div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    # Save the dataframe in session state (a dictionary-like object that persists across
-    # page runs). This ensures our data is persisted when the app updates.
-    st.session_state.df = df
+    st.markdown("<div class='chatbox'>", unsafe_allow_html=True)
 
-
-# Show a section to add a new ticket.
-st.header("Add a ticket")
-
-# We're adding tickets via an `st.form` and some input widgets. If widgets are used
-# in a form, the app will only rerun once the submit button is pressed.
-with st.form("add_ticket_form"):
-    issue = st.text_area("Describe the issue")
-    priority = st.selectbox("Priority", ["High", "Medium", "Low"])
-    submitted = st.form_submit_button("Submit")
-
-if submitted:
-    # Make a dataframe for the new ticket and append it to the dataframe in session
-    # state.
-    recent_ticket_number = int(max(st.session_state.df.ID).split("-")[1])
-    today = datetime.datetime.now().strftime("%m-%d-%Y")
-    df_new = pd.DataFrame(
-        [
-            {
-                "ID": f"TICKET-{recent_ticket_number+1}",
-                "Issue": issue,
-                "Status": "Open",
-                "Priority": priority,
-                "Date Submitted": today,
-            }
+    if "mensagens" not in st.session_state:
+        st.session_state.mensagens = [
+            {"role":"assistant","content":"Olá! 👋 Sou o Pixel, seu assistente de suporte de TI. Como posso ajudar hoje?"}
         ]
-    )
 
-    # Show a little success message.
-    st.write("Ticket submitted! Here are the ticket details:")
-    st.dataframe(df_new, use_container_width=True, hide_index=True)
-    st.session_state.df = pd.concat([df_new, st.session_state.df], axis=0)
+    for m in st.session_state.mensagens:
+        with st.chat_message(m["role"]):
+            st.write(m["content"])
 
-# Show section to view and edit existing tickets in a table.
-st.header("Existing tickets")
-st.write(f"Number of tickets: `{len(st.session_state.df)}`")
+    pergunta = st.chat_input("Digite sua dúvida aqui...")
 
-st.info(
-    "You can edit the tickets by double clicking on a cell. Note how the plots below "
-    "update automatically! You can also sort the table by clicking on the column headers.",
-    icon="✍️",
-)
+    if pergunta:
+        st.session_state.mensagens.append({"role":"user","content":pergunta})
+        with st.chat_message("user"):
+            st.write(pergunta)
 
-# Show the tickets dataframe with `st.data_editor`. This lets the user edit the table
-# cells. The edited data is returned as a new dataframe.
-edited_df = st.data_editor(
-    st.session_state.df,
-    use_container_width=True,
-    hide_index=True,
-    column_config={
-        "Status": st.column_config.SelectboxColumn(
-            "Status",
-            help="Ticket status",
-            options=["Open", "In Progress", "Closed"],
-            required=True,
-        ),
-        "Priority": st.column_config.SelectboxColumn(
-            "Priority",
-            help="Priority",
-            options=["High", "Medium", "Low"],
-            required=True,
-        ),
-    },
-    # Disable editing the ID and Date Submitted columns.
-    disabled=["ID", "Date Submitted"],
-)
+        mensagens_ollama = [
+            {
+                "role":"system",
+                "content":(
+                    "Você é Pixel, um assistente virtual masculino de suporte de TI. "
+                    "Responda sempre em português do Brasil. "
+                    "Seja claro, direto, educado e útil. "
+                    "Não mostre raciocínio interno. Dê somente a resposta final. /no_think"
+                )
+            }
+        ] + st.session_state.mensagens
 
-# Show some metrics and charts about the ticket.
-st.header("Statistics")
+        try:
+            with st.spinner("Pensando..."):
+                r = requests.post(
+                    "http://localhost:11434/api/chat",
+                    json={"model":MODELO,"messages":mensagens_ollama,"stream":False,"think":False},
+                    timeout=300
+                )
+            r.raise_for_status()
+            texto = r.json()["message"]["content"]
+        except Exception as erro:
+            texto = f"Não consegui acessar o Ollama. Erro: {erro}"
 
-# Show metrics side by side using `st.columns` and `st.metric`.
-col1, col2, col3 = st.columns(3)
-num_open_tickets = len(st.session_state.df[st.session_state.df.Status == "Open"])
-col1.metric(label="Number of open tickets", value=num_open_tickets, delta=10)
-col2.metric(label="First response time (hours)", value=5.2, delta=-1.5)
-col3.metric(label="Average resolution time (hours)", value=16, delta=2)
+        st.session_state.mensagens.append({"role":"assistant","content":texto})
+        with st.chat_message("assistant"):
+            st.write(texto)
 
-# Show two Altair charts using `st.altair_chart`.
-st.write("")
-st.write("##### Ticket status per month")
-status_plot = (
-    alt.Chart(edited_df)
-    .mark_bar()
-    .encode(
-        x="month(Date Submitted):O",
-        y="count():Q",
-        xOffset="Status:N",
-        color="Status:N",
-    )
-    .configure_legend(
-        orient="bottom", titleFontSize=14, labelFontSize=14, titlePadding=5
-    )
-)
-st.altair_chart(status_plot, use_container_width=True, theme="streamlit")
+    st.markdown("<div class='small-note'>O Pixel pode cometer erros. Em dúvidas críticas, confirme com o time de TI.</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("<div class='footer-note'>🔒 Seguro &nbsp;&nbsp; 👥 Confiável &nbsp;&nbsp; 📈 Sempre evoluindo</div>", unsafe_allow_html=True)
 
-st.write("##### Current ticket priorities")
-priority_plot = (
-    alt.Chart(edited_df)
-    .mark_arc()
-    .encode(theta="count():Q", color="Priority:N")
-    .properties(height=300)
-    .configure_legend(
-        orient="bottom", titleFontSize=14, labelFontSize=14, titlePadding=5
-    )
-)
-st.altair_chart(priority_plot, use_container_width=True, theme="streamlit")
+elif menu == "📚 Base de Conhecimento":
+    st.title("📚 Base de Conhecimento")
+    st.info("Aqui você poderá adicionar procedimentos, manuais e conteúdos para o Pixel consultar.")
+elif menu == "▶️ Tutoriais":
+    st.title("▶️ Tutoriais")
+    st.info("Área para tutoriais de suporte e vídeos.")
+elif menu == "🎫 Abrir Chamado":
+    st.title("🎫 Abrir Chamado")
+    st.info("Aqui você poderá integrar um formulário de abertura de chamados.")
+elif menu == "📢 Novidades":
+    st.title("📢 Novidades")
+    st.info("Área para avisos e atualizações de TI.")
+else:
+    st.title("ℹ️ Sobre a Pixel")
+    st.write("Pixel é um assistente virtual de suporte de TI.")
